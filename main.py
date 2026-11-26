@@ -32,13 +32,15 @@ OUTPUT = Path("/output/entry.txt")
 def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(LINE + "\n", encoding="ascii")
-    written = OUTPUT.read_text(encoding="ascii").strip()
-    assert written == LINE, "written entry does not match LINE"
+    # Exact read-back (no .strip()): stripping would mask a stray space or
+    # extra newline in the file, so compare the raw text verbatim.
+    written = OUTPUT.read_text(encoding="ascii")
+    assert written == LINE + "\n", "written entry does not match LINE"
     # Byte-exact: the file must hold exactly LINE plus one trailing newline.
     assert OUTPUT.read_bytes() == (LINE + "\n").encode("ascii"), (
         "entry file bytes differ from LINE"
     )
-    print(written)
+    print(written, end="")
 
 
 if __name__ == "__main__":
